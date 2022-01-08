@@ -8,18 +8,18 @@ namespace RestFulApiApp.Controllers
     [Route("[controller]")]
     public class DishesController : Controller
     {
-        private readonly DataService _dataService;
+        private readonly DataContext _dataContext;
 
-        public DishesController(DataService dataService)
+        public DishesController(DataContext dataContext)
         {
-            _dataService = dataService;
+            _dataContext = dataContext ?? throw new ArgumentException(nameof(_dataContext));
         }
 
         // get all  https://localhost:7273/dishes
         [HttpGet]
         public List<Dish> GetDishes()
         {
-            return _dataService.Dishes;
+            return _dataContext.Dishes.ToList();
         }
 
 
@@ -27,7 +27,7 @@ namespace RestFulApiApp.Controllers
         [HttpGet("{id}")]
         public Dish GetDishById(int id)
         {
-            var itemById = _dataService.Dishes.FirstOrDefault(d => d.Id == id);
+            var itemById = _dataContext.Dishes.FirstOrDefault(d => d.Id == id);
             
             if(itemById == null)
             {
@@ -40,21 +40,18 @@ namespace RestFulApiApp.Controllers
         // create https://localhost:7273/dishes
         public void CreateDish(Dish item)
         {
-            _dataService.Dishes.Add(item);
+            _dataContext.Dishes.Add(item);
+            _dataContext.SaveChanges();
         }
 
         // update https://localhost:7273/dishes
         [HttpPut]
         public void UpdateDish(Dish item)
         {
-            var dishToUpdate = _dataService.Dishes.FirstOrDefault(d => d.Id == item.Id);
-                
-                if (dishToUpdate == null)
-            {
-                throw new KeyNotFoundException();
-            }
-               
-            _dataService.Dishes[item.Id] = item;
+           
+            _dataContext.Dishes.Update(item);
+            _dataContext.SaveChanges();
+
 
         }
 
@@ -62,14 +59,15 @@ namespace RestFulApiApp.Controllers
         [HttpDelete("{id}")]
         public void DeleteDish(int id)
         {
-            var dishToDelete = _dataService.Dishes.FirstOrDefault(d => d.Id == id);
+            var dishToDelete = _dataContext.Dishes.FirstOrDefault(d => d.Id == id);
 
             if (dishToDelete == null)
             {
                 throw new KeyNotFoundException();
             }
 
-            _dataService.Dishes.Remove(dishToDelete);
+            _dataContext.Remove(dishToDelete);
+            _dataContext.SaveChanges();
         }
     }
 }

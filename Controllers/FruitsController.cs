@@ -9,24 +9,25 @@ namespace RestFulApiApp.Controllers
     public class FruitsController : Controller
     {
 
-        private readonly DataService _dataService;
-        public FruitsController(DataService dataService)
+        private readonly DataContext _dataContext;
+
+        public FruitsController(DataContext dataContext)
         {
-            _dataService = dataService;
+            _dataContext = dataContext ?? throw new ArgumentException(nameof(_dataContext));
         }
 
         // get all fruits  https://localhost:7273/fruits
         [HttpGet]
         public List<Fruit> GetFruits()
         {
-            return _dataService.Fruits;
+            return _dataContext.Fruits.ToList();
         }
 
         // get  fruit by id  https://localhost:7273/fruits/1
         [HttpGet("{id}")]
         public Fruit GetFruitById(int id)
         {
-            var item = _dataService.Fruits.FirstOrDefault(i => i.Id == id);
+            var item = _dataContext.Fruits.FirstOrDefault(i => i.Id == id);
             if (item == null)
             {
                 throw new KeyNotFoundException();
@@ -38,33 +39,27 @@ namespace RestFulApiApp.Controllers
         [HttpPost]
         public void CreateFruit(Fruit item)
         {
-            _dataService.Fruits.Add(item);
+            _dataContext.Add(item);
+            _dataContext.SaveChanges();
         }
 
         // update fruit  https://localhost:7273/fruits
         [HttpPut]
         public void UpdateFruit(Fruit item)
         {
-            var itemToReplace = _dataService.Fruits.FirstOrDefault(i => i.Id == item.Id);
-            if (item == null)
-            {
-                throw new KeyNotFoundException();
-            }
-
-            _dataService.Fruits[item.Id] = item;
+            _dataContext.Fruits.Update(item);
+            _dataContext.SaveChanges();
         }
 
         [HttpDelete("{id}")]
         public void DeleteFruit(int id)
         {
-            var item = _dataService.Fruits.FirstOrDefault(i => i.Id == id);
-            if (item == null)
+            var item = _dataContext.Fruits.FirstOrDefault(i => i.Id == id);
+            if (item != null)
             {
-                throw new KeyNotFoundException();
+                _dataContext.Remove(item);
+                _dataContext.SaveChanges();
             }
-
-            _dataService.Fruits.Remove(item);
-
         }
     }
 }

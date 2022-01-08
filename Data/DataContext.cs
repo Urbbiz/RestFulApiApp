@@ -12,6 +12,6 @@ namespace RestFulApiApp.Data
          
         public DbSet<Dish>?  Dishes { get; set; }
         public DbSet<Fruit>? Fruits { get; set; }
-        public DbSet<Vegetable> Vegetables { get; set; }
+        public DbSet<Vegetable>? Vegetables { get; set; }
     }
 }
