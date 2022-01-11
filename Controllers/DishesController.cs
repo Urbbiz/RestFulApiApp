@@ -15,13 +15,19 @@ namespace RestFulApiApp.Controllers
             _dataContext = dataContext ?? throw new ArgumentException(nameof(_dataContext));
         }
 
-        // get all  https://localhost:7273/dishes
+       
         [HttpGet]
-        public List<Dish> GetDishes()
+        public IActionResult GetDishes()
         {
-            return _dataContext.Dishes.ToList();
-        }
+            var result = _dataContext.Dishes.ToList();
 
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
 
         // get by id https://localhost:7273/dishes/1
         [HttpGet("{id}")]
